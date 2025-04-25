@@ -1,6 +1,6 @@
 import React, { useEffect, Component } from "react";
 import { useAuth } from "../context/AuthContext";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
 
 // Color palette with Indian flag theme
@@ -56,11 +56,24 @@ class VoterErrorBoundary extends Component {
 export function UserDashboard() {
   const { user, getUser } = useAuth();
   const { id } = useParams();
+  const navigate = useNavigate();
 
   // Fetch user data on mount
   useEffect(() => {
     if (id) getUser(id);
   }, [id]);
+
+  const handleRegister = () => {
+    navigate('/signup'); // Navigate to voter registration page
+  };
+
+  const handleAction = (action) => {
+    if (action === "Register") {
+      handleRegister();
+    } else {
+      alert(`${action} Clicked`);
+    }
+  };
 
   // Loading state
   if (!user) {
@@ -104,9 +117,6 @@ export function UserDashboard() {
     return rfid.slice(0, -4) + "XX:XX";
   };
 
-  // Handle action button clicks
-  const handleAction = (action) => alert(`${action} Clicked`);
-
   return (
     <VoterErrorBoundary>
       <div
@@ -131,7 +141,7 @@ export function UserDashboard() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
-              Smart Ballot
+              Smart Voter Verification System
             </motion.h1>
             <motion.p
               className="text-sm md:text-base font-medium truncate"
@@ -139,7 +149,7 @@ export function UserDashboard() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
-              {updatedUser.NAME}
+              Welcome, {updatedUser.NAME}
             </motion.p>
           </div>
         </header>
@@ -159,7 +169,7 @@ export function UserDashboard() {
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.5, ease: "easeInOut" }}
             >
-              Voter Dashboard
+              Voter Details
             </motion.h2>
           </div>
 
@@ -404,8 +414,6 @@ export function UserDashboard() {
                           style={{ color: colors.darkGray }}
                         >
                           {maskRFID(updatedUser.RFID_NO)}
-                          
-                           
                         </p>
                       </div>
                       <div>
@@ -420,7 +428,6 @@ export function UserDashboard() {
                           style={{ color: colors.darkGray }}
                         >
                           {updatedUser.NAME}
-                          
                         </p>
                       </div>
                       <div>
@@ -435,7 +442,6 @@ export function UserDashboard() {
                           style={{ color: colors.darkGray }}
                         >
                           {updatedUser.DOB}
-                         
                         </p>
                       </div>
                       <div>
@@ -450,7 +456,6 @@ export function UserDashboard() {
                           style={{ color: colors.darkGray }}
                         >
                           {updatedUser.GENDER}
-                         
                         </p>
                       </div>
                     </div>
@@ -551,8 +556,6 @@ export function UserDashboard() {
                           style={{ color: colors.darkGray, maxWidth: "160px" }}
                         >
                           {updatedUser.PERMANENT_ADDRESS}
-                          
-                           
                         </p>
                       </div>
                       <div>
@@ -567,8 +570,6 @@ export function UserDashboard() {
                           style={{ color: colors.darkGray, maxWidth: "160px" }}
                         >
                           {updatedUser.PHN_NO}
-                          
-                          
                         </p>
                       </div>
                     </div>

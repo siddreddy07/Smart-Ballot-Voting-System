@@ -154,7 +154,7 @@ export function VerificationStep({ onNext, stateId }) {
                       key={center.center_id}
                       className={`p-3 sm:p-4 border rounded-lg cursor-pointer transition-all duration-200 ${
                         selectedCenter?.center_id === center.center_id
-                          ? 'border-blue-600 bg-blue-100' // Highlight selected center with a different color
+                          ? 'border-blue-600 bg-blue-100'
                           : 'border-saffron-300 bg-white hover:border-saffron-600 hover:bg-saffron-100'
                       }`}
                       onClick={() => handleCenterSelect(center)}
@@ -206,7 +206,7 @@ export function VerificationStep({ onNext, stateId }) {
                     onClick={() => handleShiftSelect('morning')}
                     className={`flex-1 py-2 sm:py-3 px-3 sm:px-4 rounded-lg flex items-center justify-center gap-2 border transition-all duration-200 ${
                       selectedShift === 'morning'
-                        ? 'bg-blue-100 border-blue-600 text-blue-600' // Highlight morning shift on selection
+                        ? 'bg-blue-100 border-blue-600 text-blue-600'
                         : 'bg-white text-saffron-900 border-saffron-300 hover:bg-saffron-100 hover:border-saffron-400'
                     }`}
                     aria-label="Select morning shift"
@@ -218,9 +218,9 @@ export function VerificationStep({ onNext, stateId }) {
                   <button
                     type="button"
                     onClick={() => handleShiftSelect('afternoon')}
-                    className={`flex-1 py-2 sm:py-3 px-3 sm:px-4 rounded-lg flex items-center justify-center gap-2 border transition-all duration-200 ${
+                    className={`flex-1 py-2 sm:py-3 px-3-com sm:px-4 rounded-lg flex items-center justify-center gap-2 border transition-all duration-200 ${
                       selectedShift === 'afternoon'
-                        ? 'bg-blue-100 border-blue-600 text-blue-600' // Highlight afternoon shift on selection
+                        ? 'bg-blue-100 border-blue-600 text-blue-600'
                         : 'bg-white text-saffron-900 border-saffron-300 hover:bg-saffron-100 hover:border-saffron-400'
                     }`}
                     aria-label="Select afternoon shift"
@@ -233,20 +233,18 @@ export function VerificationStep({ onNext, stateId }) {
               </div>
 
               <button
-  onClick={handleSubmit}
-  disabled={!selectedDate || !selectedShift || !selectedCenter}
-  className={`w-full px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base ${
-    selectedDate && selectedShift && selectedCenter
-      ? 'bg-blue-600 text-white hover:bg-blue-700'
-      : 'bg-blue-300 text-blue-900 cursor-not-allowed opacity-50'
-  }`}
-  aria-label="Schedule appointment"
->
-  <Calendar className="h-4 sm:h-5 w-4 sm:w-5" />
-  Schedule Appointment
-</button>
-
-
+                onClick={handleSubmit}
+                disabled={!selectedDate || !selectedShift || !selectedCenter}
+                className={`w-full px-3 sm:px-4 py-2 rounded-md flex items-center justify-center gap-2 transition-all duration-200 text-sm sm:text-base ${
+                  selectedDate && selectedShift && selectedCenter
+                    ? 'bg-blue-600 text-white hover:bg-blue-700'
+                    : 'bg-blue-300 text-blue-900 cursor-not-allowed opacity-50'
+                }`}
+                aria-label="Schedule appointment"
+              >
+                <Calendar className="h-4 sm:h-5 w-4 sm:w-5" />
+                Schedule Appointment
+              </button>
             </div>
           )}
         </div>
@@ -255,23 +253,20 @@ export function VerificationStep({ onNext, stateId }) {
       {/* Map Section */}
       <div className="md:block mt-4 md:mt-0">
         <div className="bg-saffron-100 rounded-lg h-64 sm:h-80 md:h-[600px] relative">
-          <div
-            className="absolute inset-0 bg-center bg-no-repeat bg-cover rounded-lg"
-            style={{
-              backgroundImage: selectedCenter
-                ? `url('https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/pin-s+ff6f00(${selectedCenter.longitude},${selectedCenter.latitude})/${selectedCenter.longitude},${selectedCenter.latitude},15/800x600@2x?access_token=YOUR_MAPBOX_TOKEN')`
-                : 'none',
-            }}
-          >
-            {!selectedCenter && (
-              <div className="absolute inset-0 flex items-center justify-center bg-saffron-100 rounded-lg">
-                <div className="bg-saffron-50 p-3 sm:p-4 rounded-lg shadow-md text-center">
-                  <MapPin className="h-6 sm:h-8 w-6 sm:w-8 text-saffron-600 mx-auto mb-2" />
-                  <p className="text-saffron-900 text-sm sm:text-base">Select a center to view on map</p>
-                </div>
+          {selectedCenter ? (
+            <img
+              src="https://th.bing.com/th/id/OIP.c-OkW4ut19tRtKZd1oIXtgHaKC?w=756&h=1024&rs=1&pid=ImgDetMain"
+              alt={`Map of ${selectedCenter.center_name}`}
+              className="absolute inset-0 w-full h-full object-cover rounded-lg"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-saffron-100 rounded-lg">
+              <div className="bg-saffron-50 p-3 sm:p-4 rounded-lg shadow-md text-center">
+                <MapPin className="h-6 sm:h-8 w-6 sm:w-8 text-saffron-600 mx-auto mb-2" />
+                <p className="text-saffron-900 text-sm sm:text-base">Select a center to view on map</p>
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

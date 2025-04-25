@@ -11,7 +11,7 @@ export function NewVoterRegistrationPage() {
   const [currentStep, setCurrentStep] = useState('personal');
   const [formData, setFormData] = useState({
     personalInfo: {},
-    appointmentInfo: {}
+    appointmentInfo: {},
   });
 
   const { userId } = useParams();
@@ -21,6 +21,9 @@ export function NewVoterRegistrationPage() {
   useEffect(() => {
     const fetchUserData = async () => {
       try {
+        let newFormData = { personalInfo: {}, appointmentInfo: {} };
+
+        // Fetch from API if userId exists
         if (userId) {
           const res = await axios.get(`/api/continue-register/${userId}`);
           const fetchedUser = res.data.user;
@@ -36,51 +39,70 @@ export function NewVoterRegistrationPage() {
               PERMANENT_ADDRESS,
               PARENT_NAME,
               IMAGE,
+              GENDER,
               VOTE_STATE,
-              TIME_ND_CENTER
+              TIME_ND_CENTER,
             } = fetchedUser;
 
-            const fullForm = {
-              personalInfo: {
-                fullName: NAME || '',
-                email: EMAIL || '',
-                phone: PHN_NO || '',
-                dob: DOB || '',
-                aadharNo: AADHAR_CARD || '',
-                presentAddress: PRESENT_ADDRESS || '',
-                permanentAddress: PERMANENT_ADDRESS || '',
-                parentName: PARENT_NAME || '',
-                selectedState: VOTE_STATE?.state_id || '',
-                selectedDistrict: VOTE_STATE?.district_id || '',
-                selectedAssembly: VOTE_STATE?.assembly_id || '',
-                photoPreview: IMAGE || ''
+            newFormData.personalInfo = {
+              fullName: NAME || '',
+              email: EMAIL || '',
+              phone: PHN_NO || '',
+              dob: DOB || '',
+              aadharNo: AADHAR_CARD || '',
+              presentAddress: PRESENT_ADDRESS || '',
+              permanentAddress: PERMANENT_ADDRESS || '',
+              parentName: PARENT_NAME || '',
+              gender: GENDER || '',
+              selectedState: VOTE_STATE?.state_id || '',
+              selectedDistrict: VOTE_STATE?.district_id || '',
+              selectedAssembly: VOTE_STATE?.assembly_id || '',
+              photoPreview: IMAGE || '',
+            };
+            newFormData.appointmentInfo = {
+              timeAndCenterData: {
+                time: TIME_ND_CENTER?.time || '',
+                center: TIME_ND_CENTER?.center || '',
               },
-              appointmentInfo: {
-                timeAndCenterData: {
-                  time: TIME_ND_CENTER?.time || '',
-                  center: TIME_ND_CENTER?.center || ''
-                }
-              }
             };
 
-            setFormData(fullForm);
-            if (IMAGE) localStorage.setItem('photoPreview', IMAGE);
-            return;
+            if (IMAGE) localStorage.setItem('PHOTO', IMAGE);
           }
         }
 
-        // fallback to localStorage if no userId
-        const localPersonalInfo = JSON.parse(localStorage.getItem('personalInfoFormData'));
-        const localTimeAndCenter = JSON.parse(localStorage.getItem('TIME_ND_CENTER'));
+        // Merge with localStorage data, prioritizing localStorage if available
+        const localPersonalInfo = JSON.parse(localStorage.getItem('personalInfoFormData') || '{}');
+        const localTimeAndCenter = JSON.parse(localStorage.getItem('TIME_ND_CENTER') || '{}');
 
-        if (localPersonalInfo || localTimeAndCenter) {
-          setFormData({
-            personalInfo: localPersonalInfo || {},
-            appointmentInfo: {
-              timeAndCenterData: localTimeAndCenter || {}
-            }
-          });
-        }
+        newFormData.personalInfo = {
+          ...newFormData.personalInfo,
+          fullName: localPersonalInfo.fullName || newFormData.personalInfo.fullName || localStorage.getItem('FULL_NAME') || '',
+          email: localPersonalInfo.email || newFormData.personalInfo.email || localStorage.getItem('EMAIL') || '',
+          phone: localPersonalInfo.phone || newFormData.personalInfo.phone || localStorage.getItem('PHONE') || '',
+          dob: localPersonalInfo.dob || newFormData.personalInfo.dob || '',
+          aadharNo: localPersonalInfo.aadharNo || newFormData.personalInfo.aadharNo || '',
+          presentAddress: localPersonalInfo.presentAddress || newFormData.personalInfo.presentAddress || localStorage.getItem('PRESENT_ADDRESS') || '',
+          permanentAddress: localPersonalInfo.permanentAddress || newFormData.personalInfo.permanentAddress || localStorage.getItem('PERMANENT_ADDRESS') || '',
+          parentName: localPersonalInfo.parentName || newFormData.personalInfo.parentName || '',
+          gender: localPersonalInfo.gender || newFormData.personalInfo.gender || '',
+          selectedState: localPersonalInfo.selectedState || newFormData.personalInfo.selectedState || localStorage.getItem('STATE_ID') || '',
+          selectedDistrict: localPersonalInfo.selectedDistrict || newFormData.personalInfo.selectedDistrict || localStorage.getItem('DISTRICT_ID') || '',
+          selectedAssembly: localPersonalInfo.selectedAssembly || newFormData.personalInfo.selectedAssembly || localStorage.getItem('ASSEMBLY_ID') || '',
+          photoPreview: localPersonalInfo.photoPreview || newFormData.personalInfo.photoPreview || localStorage.getItem('PHOTO') || '',
+        };
+
+        newFormData.appointmentInfo = {
+          timeAndCenterData: {
+            time: localTimeAndCenter.time || newFormData.appointmentInfo.timeAndCenterData.time || '',
+            center: localTimeAndCenter.center || newFormData.appointmentInfo.timeAndCenterData.center || '',
+          },
+        };
+
+        setFormData(newFormData);
+
+        // Update localStorage to ensure consistency
+        localStorage.setItem('personalInfoFormData', JSON.stringify(newFormData.personalInfo));
+        localStorage.setItem('TIME_ND_CENTER', JSON.stringify(newFormData.appointmentInfo.timeAndCenterData));
       } catch (error) {
         console.error('Failed to fetch user registration data or parse local storage', error);
       }
@@ -102,35 +124,61 @@ export function NewVoterRegistrationPage() {
   };
 
   const handleConfirmation = () => {
-    console.log('Current Form Data:', formData);
+    // Construct finalData, prioritizing localStorage to handle refreshes
+    const localPersonalInfo = JSON.parse(localStorage.getItem('personalInfoFormData') || '{}');
+    const localTimeAndCenter = JSON.parse(localStorage.getItem('TIME_ND_CENTER') || '{}');
 
-    const personal = formData?.personalInfo || {};
-    const appointment = formData?.appointmentInfo?.timeAndCenterData || {};
+    const personal = {
+      fullName: localPersonalInfo.fullName || formData.personalInfo.fullName || localStorage.getItem('FULL_NAME') || '',
+      parentName: localPersonalInfo.parentName || formData.personalInfo.parentName || '',
+      email: localPersonalInfo.email || formData.personalInfo.email || localStorage.getItem('EMAIL') || '',
+      dob: localPersonalInfo.dob || formData.personalInfo.dob || '',
+      aadharNo: localPersonalInfo.aadharNo || formData.personalInfo.aadharNo || '',
+      phone: localPersonalInfo.phone || formData.personalInfo.phone || localStorage.getItem('PHONE') || '',
+      presentAddress: localPersonalInfo.presentAddress || formData.personalInfo.presentAddress || localStorage.getItem('PRESENT_ADDRESS') || '',
+      permanentAddress: localPersonalInfo.permanentAddress || formData.personalInfo.permanentAddress || localStorage.getItem('PERMANENT_ADDRESS') || '',
+      gender: localPersonalInfo.gender || formData.personalInfo.gender || '',
+      photoPreview: localPersonalInfo.photoPreview || formData.personalInfo.photoPreview || localStorage.getItem('PHOTO') || '',
+      selectedState: localPersonalInfo.selectedState || formData.personalInfo.selectedState || localStorage.getItem('STATE_ID') || '',
+      selectedDistrict: localPersonalInfo.selectedDistrict || formData.personalInfo.selectedDistrict || localStorage.getItem('DISTRICT_ID') || '',
+      selectedAssembly: localPersonalInfo.selectedAssembly || formData.personalInfo.selectedAssembly || localStorage.getItem('ASSEMBLY_ID') || '',
+    };
+
+    const appointment = {
+      time: localTimeAndCenter.time || formData.appointmentInfo?.timeAndCenterData?.time || '',
+      center: localTimeAndCenter.center || formData.appointmentInfo?.timeAndCenterData?.center || '',
+    };
 
     const finalData = {
-      NAME: personal.fullName || '',
-      PARENT_NAME: personal.parentName || '',
-      EMAIL: personal.email || '',
-      DOB: personal.dob || '',
-      AADHAR_CARD: personal.aadharNo || '',
-      PHN_NO: personal.phone || '',
-      PRESENT_ADDRESS: personal.presentAddress || '',
-      PERMANENT_ADDRESS: personal.permanentAddress || '',
-      GENDER: personal.gender || '',
-      IMAGE: personal.photoPreview || '',
+      NAME: personal.fullName,
+      PARENT_NAME: personal.parentName,
+      EMAIL: personal.email,
+      DOB: personal.dob,
+      AADHAR_CARD: personal.aadharNo,
+      PHN_NO: personal.phone,
+      PRESENT_ADDRESS: personal.presentAddress,
+      PERMANENT_ADDRESS: personal.permanentAddress,
+      GENDER: personal.gender,
+      IMAGE: personal.photoPreview,
       VOTE_STATE: {
-        state_id: personal.selectedState || '',
-        district_id: personal.selectedDistrict || '',
-        assembly_id: personal.selectedAssembly || '',
-        parliamentary_id: personal.selectedDistrict || ''
+        state_id: personal.selectedState,
+        district_id: personal.selectedDistrict,
+        assembly_id: personal.selectedAssembly,
+        parliamentary_id: personal.selectedDistrict, // Assuming district_id is used for parliamentary_id
       },
       TIME_ND_CENTER: {
-        time: appointment?.time || '',
-        center: appointment?.center || ''
-      }
+        time: appointment.time,
+        center: appointment.center,
+      },
     };
 
     console.log('Final data to send:', finalData);
+
+    // Update formData to reflect finalData for consistency
+    setFormData({
+      personalInfo: personal,
+      appointmentInfo: { timeAndCenterData: appointment },
+    });
 
     AddDetails(finalData, navigate);
   };
@@ -138,7 +186,7 @@ export function NewVoterRegistrationPage() {
   const steps = [
     { id: 'personal', label: 'Personal Information' },
     { id: 'verification', label: 'Identity Verification' },
-    { id: 'confirmation', label: 'Confirmation' }
+    { id: 'confirmation', label: 'Confirmation' },
   ];
 
   return (
@@ -184,7 +232,7 @@ export function NewVoterRegistrationPage() {
         <div className="bg-white shadow-lg rounded-lg">
           {currentStep === 'personal' && (
             <PersonalInfoForm
-              key={JSON.stringify(formData?.personalInfo)} // force re-render
+              key={JSON.stringify(formData?.personalInfo)}
               onNext={handlePersonalInfoSubmit}
               initialValues={formData?.personalInfo}
             />

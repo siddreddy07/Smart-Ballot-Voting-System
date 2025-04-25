@@ -276,26 +276,26 @@ export const getUsersByCenterAndShift = async (req, res) => {
     let shiftEndStr = null;
     let shiftLabel = null;
 
-    // Shift 1: 12:30 AM - 12:30 PM
+    // Morning Shift: 9:00 AM - 12:30 PM
     if (
-      (currentHour === 0 && currentMinute >= 30) ||
-      (currentHour > 0 && currentHour < 12) ||
+      (currentHour === 9 && currentMinute >= 0) ||
+      (currentHour > 9 && currentHour < 12) ||
       (currentHour === 12 && currentMinute <= 30)
     ) {
-      shiftStartStr = `${todayStr} 00:30:00`;
+      shiftStartStr = `${todayStr} 09:00:00`;
       shiftEndStr = `${todayStr} 12:30:00`;
-      shiftLabel = '12:30 AM to 12:30 PM';
+      shiftLabel = '9:00 AM to 12:30 PM';
     }
 
-    // Shift 2: 2:30 PM - 11:50 PM
+    // Evening Shift: 1:30 PM - 5:00 PM
     else if (
-      (currentHour === 14 && currentMinute >= 30) ||
-      (currentHour > 14 && currentHour < 23) ||
-      (currentHour === 23 && currentMinute <= 50)
+      (currentHour === 13 && currentMinute >= 30) ||
+      (currentHour > 13 && currentHour < 17) ||
+      (currentHour === 17 && currentMinute <= 0)
     ) {
-      shiftStartStr = `${todayStr} 14:30:00`;
-      shiftEndStr = `${todayStr} 23:50:00`;
-      shiftLabel = '2:30 PM to 11:50 PM';
+      shiftStartStr = `${todayStr} 13:30:00`;
+      shiftEndStr = `${todayStr} 17:00:00`;
+      shiftLabel = '1:30 PM to 5:00 PM';
     }
 
     else {
@@ -354,8 +354,7 @@ export const updateUserByVerificationOfficer = async (req, res) => {
   const { targetUserId, IMAGE, FINGERPRINT, EMAIL, PHN_NO, RFID_NO } = req.body;
 
   try {
-
-    console.log(RFID_NO)
+    console.log(RFID_NO);
     // Check for RFID conflict
     if (RFID_NO !== undefined) {
       const existingUser = await User.findOne({ where: { RFID_NO } });
@@ -385,8 +384,7 @@ export const updateUserByVerificationOfficer = async (req, res) => {
     // Find target user
     const targetUser = await User.findOne({ where: { S_NO: targetUserId } });
 
-    console.log(targetUser.RFID_NO)
-
+    console.log(targetUser.RFID_NO);
 
     if (!targetUser) {
       return res.status(404).json({
@@ -416,15 +414,17 @@ export const updateUserByVerificationOfficer = async (req, res) => {
     const currentTime = new Date();
     const userShiftTime = new Date(userTime);
 
+    // Morning Shift: 9:00 AM - 12:30 PM
     const shiftStart1 = new Date(userShiftTime);
-    shiftStart1.setHours(0, 16, 0);
+    shiftStart1.setHours(9, 0, 0);
     const shiftEnd1 = new Date(userShiftTime);
-    shiftEnd1.setHours(20, 30, 0);
+    shiftEnd1.setHours(12, 30, 0);
 
+    // Evening Shift: 1:30 PM - 5:00 PM
     const shiftStart2 = new Date(userShiftTime);
-    shiftStart2.setHours(14, 30, 0);
+    shiftStart2.setHours(13, 30, 0);
     const shiftEnd2 = new Date(userShiftTime);
-    shiftEnd2.setHours(22, 0, 0);
+    shiftEnd2.setHours(17, 0, 0);
 
     const isInShift =
       (currentTime >= shiftStart1 && currentTime <= shiftEnd1) ||
@@ -439,8 +439,6 @@ export const updateUserByVerificationOfficer = async (req, res) => {
 
     // Prepare updated fields
     const updatedFields = {};
-
-    
 
     // ✅ Image handling: delete old image, upload new one
     if (IMAGE !== undefined) {
@@ -482,19 +480,18 @@ export const updateUserByVerificationOfficer = async (req, res) => {
 
 
 
-
 export const getUserDetailsByVerificationOfficer = async (req, res) => {
   const { userId } = req; // VO's user ID
   const { targetUserId } = req.query; // User's ID to fetch
 
-  console.log(typeof(targetUserId))
+  console.log(typeof(targetUserId));
 
   try {
     const verificationOfficer = await VerificationOfficer.findOne({
       where: { SUPERVISOR_ID: userId }
     });
 
-    console.log(verificationOfficer)
+    console.log(verificationOfficer);
 
     if (!verificationOfficer) {
       return res.status(404).json({
@@ -505,11 +502,11 @@ export const getUserDetailsByVerificationOfficer = async (req, res) => {
 
     const officerCenter = verificationOfficer.CENTER;
 
-    console.log(officerCenter)
+    console.log(officerCenter);
 
     const targetUser = await User.findOne({ where: { S_NO: targetUserId } });
 
-    console.log(targetUser)
+    console.log(targetUser);
 
     if (!targetUser) {
       return res.status(404).json({
@@ -539,15 +536,17 @@ export const getUserDetailsByVerificationOfficer = async (req, res) => {
     const now = new Date();
     const shiftBaseDate = new Date(userShiftTime);
 
+    // Morning Shift: 9:00 AM - 12:30 PM
     const shiftStart1 = new Date(shiftBaseDate);
-    shiftStart1.setHours(0, 10, 0); // 12:30 AM
+    shiftStart1.setHours(9, 0, 0); // 9:00 AM
     const shiftEnd1 = new Date(shiftBaseDate);
-    shiftEnd1.setHours(15, 30, 0); // 12:30 PM
+    shiftEnd1.setHours(12, 30, 0); // 12:30 PM
 
-    const shiftStart2 = new Date(shiftBaseDate);
-    shiftStart2.setHours(14, 30, 0); // 2:30 PM
+    // Evening Shift: 1:30 PM - 5:00 PM
+    const shiftStart2 = new Date(shiftBaseDate); // Declare shiftStart2
+    shiftStart2.setHours(13, 30, 0); // 1:30 PM
     const shiftEnd2 = new Date(shiftBaseDate);
-    shiftEnd2.setHours(24, 0, 0); // 10:00 PM
+    shiftEnd2.setHours(17, 0, 0); // 5:00 PM
 
     const isInShift =
       (now >= shiftStart1 && now <= shiftEnd1) ||
@@ -560,22 +559,21 @@ export const getUserDetailsByVerificationOfficer = async (req, res) => {
       });
     }
 
+    const candidate = targetUser.toJSON();
 
-    const candiate = targetUser.toJSON()
+    delete candidate.VOTING_BOOTH;
+    delete candidate.VOTE_STATE;
+    delete candidate.TIME_ND_CENTER;
+    delete candidate.FINGERPRINT;
+    delete candidate.RFID_NO;
 
-    delete candiate.VOTING_BOOTH;
-    delete candiate.VOTE_STATE;
-    delete candiate.TIME_ND_CENTER;
-    delete candiate.FINGERPRINT
-    delete candiate.RFID_NO
-
-    console.log(candiate)
+    console.log(candidate);
 
     // All validations passed — send full user data
     return res.status(200).json({
       success: true,
       message: 'User details fetched successfully',
-      data: candiate
+      data: candidate
     });
 
   } catch (error) {
@@ -586,6 +584,7 @@ export const getUserDetailsByVerificationOfficer = async (req, res) => {
     });
   }
 };
+
 
 
 

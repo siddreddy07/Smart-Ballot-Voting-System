@@ -17,7 +17,7 @@ export function BoothOfficerProvider({ children }) {
       if (res.data.success) {
         setbofficer(res.data.bofficer);
         toast.success(res.data.message);
-        navigate('/boothofficer-dashboard');
+        navigate('/login');
         return true;
       } else {
         toast.error(res.data.message);

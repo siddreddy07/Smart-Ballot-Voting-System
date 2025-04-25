@@ -24,7 +24,7 @@ export function CandidateContextProvider({children}){
     
             if(res.data.success){
                 setcandidate(res.data.candidate)
-                toast.success(res.data.message)
+                toast.success('Candidate Registered Succssfully')
             }
             else{
                 toast.error(res.data.message)

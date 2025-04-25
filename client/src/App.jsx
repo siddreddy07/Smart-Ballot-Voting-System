@@ -79,8 +79,8 @@ function App() {
         <Route path="/zonal" element={<ZonalPage />} />
         <Route path="/center" element={<CenterPage />} />
         <Route path="/booth" element={<BoothPage />} />
-        <Route path="/vofficer/register" element={<VerificationOfficerSignup />} />
-        <Route path="/vofficer/login" element={<VerificationOfficerLogin />} />
+        <Route path="/verification-officer/register" element={<VerificationOfficerSignup />} />
+        <Route path="/verification-officer/login" element={<VerificationOfficerLogin />} />
         <Route path="/vofficer-dashboard" element={<VerificationOfficerDashboard />} />
         <Route path="/voter-requests" element={<VoterRequestsPage />} />
         <Route path="/voter-tokens" element={<VerificationDashboard />} />

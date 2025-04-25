@@ -11,6 +11,7 @@ export default function VerificationOfficerSignup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [supervisor, setSupervisor] = useState("");
+  const [rfidNo, setRfidNo] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Validate email: basic email format
@@ -22,11 +23,12 @@ export default function VerificationOfficerSignup() {
     password.trim() &&
     confirmPassword.trim() &&
     supervisor.trim() &&
+    rfidNo.trim() &&
     isEmailValid &&
     password === confirmPassword;
 
   const handleSubmit = async () => {
-    if (!email || !password || !confirmPassword || !supervisor) {
+    if (!email || !password || !confirmPassword || !supervisor || !rfidNo) {
       return toast.error("All fields are required!");
     }
     if (!isEmailValid) {
@@ -42,6 +44,7 @@ export default function VerificationOfficerSignup() {
       EMAIL: email,
       PASSWORD: password,
       SUPERVISOR_NAME: supervisor,
+      RFID_NO: rfidNo,
     });
 
     setLoading(false);
@@ -146,6 +149,23 @@ export default function VerificationOfficerSignup() {
               {email.trim() && !supervisor.trim() && (
                 <p className="text-sm text-red-500">
                   Supervisor Name is required
+                </p>
+              )}
+            </div>
+
+            {/* RFID Number */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">RFID Number *</label>
+              <input
+                type="text"
+                placeholder="Enter RFID Number"
+                value={rfidNo}
+                onChange={(e) => setRfidNo(e.target.value)}
+                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#f97316] focus:border-[#f97316] transition-all"
+              />
+              {email.trim() && !rfidNo.trim() && (
+                <p className="text-sm text-red-500">
+                  RFID Number is required
                 </p>
               )}
             </div>

@@ -265,7 +265,7 @@ export default function VoterVerificationAtBooth() {
         throw new Error("Voter RFID or Fingerprint data missing");
       }
 
-      const response = await axios.post('http://localhost:5000/api/auth/booth-officer/verify-voter', {
+      const response = await axios.post('http://192.168.124.83:5000/api/auth/booth-officer/verify-voter', {
         S_NO: voter.S_NO,
         BOOTH_ID: boothId,
         RFID_NO: voter.RFID_NO,

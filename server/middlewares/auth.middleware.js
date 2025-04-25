@@ -45,15 +45,16 @@ export const protectroute = async (req, res, next) => {
       req.user = user; // Optional: attach full user
     }
 
-    // If token has EMAIL, check across VerificationOfficer, Candidate, BoothOfficer
+    // If token has EMAIL, check across VerificationOfficer, Candidate, BoothOfficer, and User
     if (decode.EMAIL) {
-      const [vOfficer, candidate, bOfficer] = await Promise.all([
+      const [vOfficer, candidate, bOfficer, userByEmail] = await Promise.all([
         VerificationOfficer.findOne({ where: { EMAIL: decode.EMAIL } }),
         Candidate.findOne({ where: { EMAIL: decode.EMAIL } }),
         BoothOfficer.findOne({ where: { OFFICER_EMAIL: decode.EMAIL } }),
+        User.findOne({ where: { EMAIL: decode.EMAIL } }), // Added User check
       ]);
 
-      user = vOfficer || candidate || bOfficer;
+      user = vOfficer || candidate || bOfficer || userByEmail;
 
       if (!user) {
         return res.status(401).json({
@@ -64,7 +65,10 @@ export const protectroute = async (req, res, next) => {
 
       // Set correct ID based on role
       req.userId =
-        vOfficer?.SUPERVISOR_ID || candidate?.CANDIDATE_ID || bOfficer?.RFID_NO;
+        vOfficer?.SUPERVISOR_ID ||
+        candidate?.CANDIDATE_ID ||
+        bOfficer?.RFID_NO ||
+        userByEmail?.S_NO; // Use S_NO for User
 
       req.user = user; // Optional: attach full user
     }

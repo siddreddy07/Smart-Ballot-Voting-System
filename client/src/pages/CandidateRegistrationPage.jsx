@@ -102,9 +102,13 @@ export default function CandidateRegistration() {
           : { ASSEMBLY_CONSTITUENCY_ID: Number(form.ASSEMBLY_ID) })
       };
 
+      console.log("Registering candidate with payload:", candidatePayload);
       await registerCandidate(candidatePayload);
+      
+
     } catch (err) {
       console.error("Registration failed:", err);
+      alert("Registration failed! See console for details.");
     } finally {
       setLoading(false);
     }
@@ -142,9 +146,10 @@ export default function CandidateRegistration() {
           <h2 className="text-3xl font-bold text-[#f97316] mb-6 text-center animate-fade-in">
             Candidate Registration
           </h2>
-          <div className="space-y-6">
-            {/* Form Fields */}
-            {[
+          
+          {/* FORM STARTS HERE */}
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {[ 
               { label: "Full Name *", name: "NAME", type: "text", placeholder: "Enter Full Name" },
               { label: "Email *", name: "EMAIL", type: "email", placeholder: "Enter Email Address" },
               { label: "RFID No *", name: "RFID_NO", type: "text", placeholder: "Enter RFID Number" },
@@ -262,7 +267,6 @@ export default function CandidateRegistration() {
               </div>
             )}
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={!isFormValid || loading}
@@ -292,7 +296,8 @@ export default function CandidateRegistration() {
                 Login Now
               </Link>
             </p>
-          </div>
+          </form>
+          {/* FORM ENDS HERE */}
         </div>
       </div>
     </div>

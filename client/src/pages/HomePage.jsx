@@ -278,7 +278,7 @@ export default function HomePage() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              {['candidate', 'booth-officer', 'vofficer'].map((type) => (
+              {['candidate', 'booth-officer', 'verification-officer'].map((type) => (
                 <motion.button
                   key={type}
                   onClick={() => {

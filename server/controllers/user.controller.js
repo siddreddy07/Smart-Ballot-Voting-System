@@ -1,5 +1,6 @@
 import User from "../models/voter.model.js";
 import { uploadImage } from "../utils/CloudinaryUtils.js";
+import { sendEmail } from "../utils/mailer.js";
 import { generateToken } from "../utils/Token.js";
 import { Op } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
@@ -102,6 +103,20 @@ export const generateOtp = async(req,res)=>{
         OTP_EXPIRY: otpExpiry
         })
       await newUser.save()
+
+      try {
+        await sendEmail({
+          to: userInput,  // No need [ ] around userInput if it's already a string (email address)
+          subject: 'Your Registration OTP - Smart Voting System',
+          text: `Your OTP is ${otp}`,
+          otp: otp.toString(),  // Making sure it's a string (good job!)
+        });
+      } catch (emailError) {
+        console.error('Email sending failed:', emailError?.message || emailError);
+        // ✅ Still allow user creation even if email fails
+      }
+      
+
       console.log('New Fresh Registration : ',otp)
       return res.status(200).json({success:true,message:'OTP Sent Successfully',userId : newUser.S_NO})
     }
@@ -332,9 +347,12 @@ export const AddDetails = async (req, res) => {
     if (!user) {
       return res.status(400).json({ success: false, message: 'No User Found' });
     }
+    console.log(user)
 
     const { addData } = req.body;
     const userData = { ...addData };
+
+    console.log(userData)
 
     // Optional: upload new image if provided
     if (userData.IMAGE !== undefined) {
